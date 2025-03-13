@@ -8,22 +8,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { LogOut, Menu, User } from "lucide-react";
+import { Bell, LogOut, Menu, User } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 interface HeaderProps {
   userName?: string;
   userRole?: "patient" | "doctor" | "admin";
   userAvatar?: string;
+  notificationCount?: number;
   onLogin?: () => void;
   onLogout?: () => void;
+  onNotificationsClick?: () => void;
 }
 
 const Header = ({
   userName = "Guest",
-  userRole,
-  userAvatar,
+  userRole = "patient",
+  userAvatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=medical",
+  notificationCount = 3,
   onLogin = () => {},
   onLogout = () => {},
+  onNotificationsClick = () => {},
 }: HeaderProps) => {
   const isLoggedIn = !!userRole;
 
@@ -58,6 +68,15 @@ const Header = ({
                   <p className="text-xs text-gray-500 capitalize">{userRole}</p>
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onNotificationsClick}>
+                  <Bell className="mr-2 h-4 w-4" />
+                  <span>Notifications</span>
+                  {notificationCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {notificationCount}
+                    </span>
+                  )}
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={onLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Logout</span>
@@ -77,6 +96,30 @@ const Header = ({
       <div className="hidden md:flex items-center gap-4">
         {isLoggedIn ? (
           <div className="flex items-center gap-3">
+            {/* Notifications */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onNotificationsClick}
+                    className="relative"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {notificationCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {notificationCount}
+                      </span>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>View notifications</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <div className="text-right mr-2">
               <p className="text-sm font-medium">{userName}</p>
               <p className="text-xs text-gray-500 capitalize">{userRole}</p>
